@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MatchVault – Entrar / Cadastrar</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0a0a0a;color:#fff;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .logo{font-size:1.6rem;font-weight:900;color:#00e87a;margin-bottom:32px;text-decoration:none;display:block;text-align:center}
+  .card{background:#111;border:1px solid #1f1f1f;border-radius:20px;padding:40px;width:100%;max-width:420px}
+  .tabs{display:flex;margin-bottom:28px;background:#0a0a0a;border-radius:10px;padding:4px}
+  .tab{flex:1;padding:10px;text-align:center;border-radius:8px;cursor:pointer;font-weight:600;font-size:.9rem;color:#888;transition:.3s;border:none;background:none}
+  .tab.active{background:#00e87a;color:#000}
+  .form-group{margin-bottom:18px}
+  label{display:block;font-size:.8rem;color:#888;margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+  input{width:100%;background:#0a0a0a;border:1px solid #2a2a2a;color:#fff;padding:12px 16px;border-radius:10px;font-size:.95rem;transition:.3s;outline:none}
+  input:focus{border-color:#00e87a;box-shadow:0 0 0 3px #00e87a22}
+  input::placeholder{color:#444}
+  .btn-primary{width:100%;background:#00e87a;color:#000;border:none;padding:14px;border-radius:10px;font-size:1rem;font-weight:800;cursor:pointer;transition:.3s;margin-top:8px}
+  .btn-primary:hover{background:#00c968;transform:translateY(-1px)}
+  .divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:#333;font-size:.8rem}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:#1f1f1f}
+  .platform-btns{display:flex;flex-direction:column;gap:10px}
+  .btn-platform{display:flex;align-items:center;gap:12px;background:#0a0a0a;border:1px solid #2a2a2a;color:#ccc;padding:12px 16px;border-radius:10px;font-size:.9rem;font-weight:600;cursor:pointer;transition:.3s;text-decoration:none}
+  .btn-platform:hover{border-color:#00e87a44;color:#fff}
+  .btn-platform span{font-size:1.2rem}
+  .terms{font-size:.75rem;color:#555;text-align:center;margin-top:20px;line-height:1.5}
+  .terms a{color:#00e87a;text-decoration:none}
+  .error{background:#2a0a0a;border:1px solid #ff444433;color:#ff6666;padding:10px 14px;border-radius:8px;font-size:.85rem;margin-bottom:16px;display:none}
+  .success{background:#0a2a0a;border:1px solid #00e87a33;color:#00e87a;padding:10px 14px;border-radius:8px;font-size:.85rem;margin-bottom:16px;display:none}
+  .back{position:fixed;top:20px;left:20px;color:#555;text-decoration:none;font-size:.9rem;display:flex;align-items:center;gap:6px;transition:.3s}
+  .back:hover{color:#00e87a}
+  .strength{display:flex;gap:4px;margin-top:6px}
+  .strength-bar{height:3px;flex:1;background:#1f1f1f;border-radius:2px;transition:.3s}
+</style>
+</head>
+<body>
+<a href="index.html" class="back">← Voltar ao site</a>
+<a href="index.html" class="logo">⚡ MatchVault</a>
+<div class="card">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('login')">Entrar</button>
+    <button class="tab" onclick="switchTab('register')">Criar Conta</button>
+  </div>
+  <div id="form-login">
+    <div id="login-error" class="error"></div>
+    <div class="form-group"><label>E-mail ou usuário</label><input type="text" id="login-email" placeholder="seunome@email.com"></div>
+    <div class="form-group"><label>Senha</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+    <button class="btn-primary" onclick="doLogin()">Entrar na plataforma →</button>
+    <div class="divider">ou entre com</div>
+    <div class="platform-btns">
+      <a href="#" class="btn-platform" onclick="loginPlatform('psn')"><span>🎮</span> Entrar com PSN</a>
+      <a href="#" class="btn-platform" onclick="loginPlatform('steam')"><span>🖥️</span> Entrar com Steam</a>
+      <a href="#" class="btn-platform" onclick="loginPlatform('xbox')"><span>🟢</span> Entrar com Xbox</a>
+    </div>
+    <p class="terms">Esqueceu a senha? <a href="#">Recuperar acesso</a></p>
+  </div>
+  <div id="form-register" style="display:none">
+    <div id="reg-error" class="error"></div>
+    <div id="reg-success" class="success"></div>
+    <div class="form-group"><label>Nome de usuário</label><input type="text" id="reg-user" placeholder="Ex: KingRonieri99" maxlength="20"></div>
+    <div class="form-group"><label>E-mail</label><input type="email" id="reg-email" placeholder="seunome@email.com"></div>
+    <div class="form-group">
+      <label>Senha</label>
+      <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres" oninput="checkStrength(this.value)">
+      <div class="strength"><div class="strength-bar" id="s1"></div><div class="strength-bar" id="s2"></div><div class="strength-bar" id="s3"></div><div class="strength-bar" id="s4"></div></div>
+    </div>
+    <div class="form-group"><label>Plataforma principal</label><input type="text" id="reg-platform" placeholder="Ex: PSN: Ronishot88"></div>
+    <button class="btn-primary" onclick="doRegister()">Criar minha conta grátis →</button>
+    <p class="terms">Ao criar conta você concorda com os <a href="#">Termos de Uso</a> e <a href="#">Política</a> do MatchVault.</p>
+  </div>
+</div>
+<script>
+function switchTab(tab){document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(tab==='login'&&i===0)||(tab==='register'&&i===1)));document.getElementById('form-login').style.display=tab==='login'?'block':'none';document.getElementById('form-register').style.display=tab==='register'?'block':'none';}
+function showError(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',4000);}
+function doLogin(){const email=document.getElementById('login-email').value.trim();const pass=document.getElementById('login-pass').value;if(!email||!pass)return showError('login-error','Preencha todos os campos.');const btn=document.querySelector('#form-login .btn-primary');btn.textContent='Entrando...';btn.disabled=true;setTimeout(()=>{localStorage.setItem('mv_user',JSON.stringify({username:email.split('@')[0]||email,email,platform:'email'}));window.location.href='dashboard.html';},1200);}
+function doRegister(){const user=document.getElementById('reg-user').value.trim();const email=document.getElementById('reg-email').value.trim();const pass=document.getElementById('reg-pass').value;const platform=document.getElementById('reg-platform').value.trim();if(!user||!email||!pass)return showError('reg-error','Preencha nome, e-mail e senha.');if(pass.length<8)return showError('reg-error','Senha precisa ter ao menos 8 caracteres.');const btn=document.querySelector('#form-register .btn-primary');btn.textContent='Criando conta...';btn.disabled=true;setTimeout(()=>{localStorage.setItem('mv_user',JSON.stringify({username:user,email,platform:platform||'N/A',joined:new Date().toLocaleDateString('pt-BR')}));const s=document.getElementById('reg-success');s.textContent='Conta criada! Redirecionando...';s.style.display='block';setTimeout(()=>window.location.href='dashboard.html',1500);},1200);}
+function loginPlatform(p){const names={psn:'Jogador_PSN',steam:'Steam_Player',xbox:'Xbox_Gamer'};localStorage.setItem('mv_user',JSON.stringify({username:names[p],email:p+'@matchvault.gg',platform:p.toUpperCase()}));window.location.href='dashboard.html';}
+function checkStrength(v){const bars=[document.getElementById('s1'),document.getElementById('s2'),document.getElementById('s3'),document.getElementById('s4')];const score=[v.length>=8,/[A-Z]/.test(v),/[0-9]/.test(v),/[^A-Za-z0-9]/.test(v)].filter(Boolean).length;const colors=['#ff4444','#ff8844','#ffcc00','#00e87a'];bars.forEach((b,i)=>b.style.background=i<score?colors[score-1]:'#1f1f1f');}
+</script>
+</body>
+</html>

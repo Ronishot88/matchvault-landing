@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MatchVault - Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#080808;color:#fff;font-family:'Segoe UI',sans-serif;display:flex;min-height:100vh}
+.sidebar{width:240px;background:#0e0e0e;border-right:1px solid #1a1a1a;display:flex;flex-direction:column;padding:24px 16px;position:fixed;height:100vh}
+.sidebar-logo{font-size:1.3rem;font-weight:900;color:#00e87a;padding:0 8px;margin-bottom:32px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;color:#888;text-decoration:none;font-size:.9rem;font-weight:600;transition:.2s;margin-bottom:4px;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover,.nav-item.active{background:#00e87a15;color:#00e87a}
+.nav-item .icon{font-size:1.1rem;width:20px}
+.sidebar-bottom{margin-top:auto}
+.user-card{display:flex;align-items:center;gap:10px;padding:12px;background:#161616;border-radius:12px;margin-bottom:12px}
+.avatar{width:36px;height:36px;background:linear-gradient(135deg,#00e87a,#00a854);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;color:#000;flex-shrink:0}
+.user-info{flex:1;overflow:hidden}
+.user-name{font-size:.85rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-level{font-size:.7rem;color:#00e87a}
+.btn-logout{width:100%;background:transparent;border:1px solid #2a2a2a;color:#666;padding:9px;border-radius:8px;font-size:.8rem;cursor:pointer;transition:.3s}
+.btn-logout:hover{border-color:#ff444444;color:#ff6666}
+.main{margin-left:240px;flex:1;padding:32px;max-width:1200px}
+.page{display:none}.page.active{display:block}
+.page-header{margin-bottom:28px}
+.page-header h1{font-size:1.6rem;font-weight:800}
+.page-header p{color:#666;font-size:.9rem;margin-top:4px}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+.stat-card{background:#111;border:1px solid #1a1a1a;border-radius:16px;padding:22px}
+.stat-card .label{font-size:.75rem;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.stat-card .value{font-size:1.8rem;font-weight:900;color:#fff}
+.stat-card .value.green{color:#00e87a}
+.stat-card .sub{font-size:.75rem;color:#555;margin-top:4px}
+.section-title{font-size:1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.btn-sm{background:#00e87a;color:#000;border:none;padding:7px 16px;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;transition:.3s}
+.challenges{display:flex;flex-direction:column;gap:12px}
+.challenge-card{background:#111;border:1px solid #1a1a1a;border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:16px;transition:.3s}
+.challenge-card:hover{border-color:#00e87a33}
+.ch-game{width:44px;height:44px;background:#1a1a1a;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.ch-info{flex:1}
+.ch-title{font-size:.95rem;font-weight:700}
+.ch-sub{font-size:.8rem;color:#666;margin-top:2px}
+.ch-value{text-align:right}
+.ch-amount{font-size:1rem;font-weight:800;color:#00e87a}
+.ch-status{font-size:.75rem;margin-top:2px}
+.status-waiting{color:#ffcc00}.status-active{color:#00e87a}.status-won{color:#00e87a}.status-lost{color:#ff6666}
+.ch-actions{display:flex;gap:8px}
+.btn-accept{background:#00e87a22;color:#00e87a;border:1px solid #00e87a44;padding:7px 14px;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;transition:.3s}
+.btn-accept:hover{background:#00e87a;color:#000}
+.btn-cancel{background:transparent;color:#666;border:1px solid #2a2a2a;padding:7px 14px;border-radius:8px;font-size:.8rem;cursor:pointer;transition:.3s}
+.form-card{background:#111;border:1px solid #1a1a1a;border-radius:16px;padding:28px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.form-group{margin-bottom:0}
+.form-group label{display:block;font-size:.75rem;color:#888;margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select{width:100%;background:#0a0a0a;border:1px solid #2a2a2a;color:#fff;padding:11px 14px;border-radius:10px;font-size:.9rem;outline:none;transition:.3s}
+.form-group input:focus,.form-group select:focus{border-color:#00e87a}
+.form-group select option{background:#111}
+.btn-create{background:#00e87a;color:#000;border:none;padding:13px 28px;border-radius:10px;font-size:.95rem;font-weight:800;cursor:pointer;transition:.3s;margin-top:8px}
+.wallet-card{background:linear-gradient(135deg,#0e1a0e,#111);border:1px solid #00e87a22;border-radius:16px;padding:28px;margin-bottom:20px}
+.wallet-balance{font-size:2.5rem;font-weight:900;color:#00e87a;margin:8px 0}
+.wallet-sub{color:#666;font-size:.85rem}
+.wallet-actions{display:flex;gap:12px;margin-top:20px}
+.btn-wallet{padding:11px 22px;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;transition:.3s}
+.btn-deposit{background:#00e87a;color:#000;border:none}
+.btn-withdraw{background:transparent;border:1px solid #2a2a2a;color:#ccc}
+.tx-list{background:#111;border:1px solid #1a1a1a;border-radius:14px;overflow:hidden}
+.tx-item{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid #1a1a1a}
+.tx-item:last-child{border-bottom:none}
+.tx-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.tx-icon.in{background:#00e87a15}.tx-icon.out{background:#ff444415}
+.tx-info{flex:1}
+.tx-desc{font-size:.9rem;font-weight:600}
+.tx-date{font-size:.75rem;color:#555;margin-top:2px}
+.tx-amount{font-weight:800;font-size:.95rem}
+.tx-amount.in{color:#00e87a}.tx-amount.out{color:#ff6666}
+.modal-bg{display:none;position:fixed;inset:0;background:#00000088;z-index:100;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#111;border:1px solid #222;border-radius:20px;padding:32px;width:90%;max-width:440px}
+.modal h3{font-size:1.1rem;font-weight:800;margin-bottom:20px}
+.modal-btns{display:flex;gap:12px;margin-top:24px}
+.modal-btns button{flex:1;padding:12px;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer}
+.modal-confirm{background:#00e87a;color:#000;border:none}
+.modal-cancel{background:transparent;border:1px solid #2a2a2a;color:#ccc}
+.toast{position:fixed;bottom:24px;right:24px;background:#111;border:1px solid #00e87a33;color:#fff;padding:14px 20px;border-radius:12px;font-size:.9rem;font-weight:600;z-index:200;display:none;align-items:center;gap:10px}
+.toast.show{display:flex}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">Lightning MatchVault</div>
+  <nav>
+    <button class="nav-item active" onclick="goPage('home',this)"><span class="icon">Home</span> Inicio</button>
+    <button class="nav-item" onclick="goPage('desafios',this)"><span class="icon">VS</span> Meus Desafios</button>
+    <button class="nav-item" onclick="goPage('novo',this)"><span class="icon">+</span> Criar Desafio</button>
+    <button class="nav-item" onclick="goPage('carteira',this)"><span class="icon">$</span> Carteira</button>
+    <button class="nav-item" onclick="goPage('historico',this)"><span class="icon">H</span> Historico</button>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="avatar" id="avatar-initial">?</div>
+      <div class="user-info">
+        <div class="user-name" id="sidebar-username">Carregando...</div>
+        <div class="user-level">Nivel Ouro</div>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="logout()">Sair da conta</button>
+  </div>
+</aside>
+<main class="main">
+  <div class="page active" id="page-home">
+    <div class="page-header"><h1>Bem-vindo, <span id="welcome-name" style="color:#00e87a">Jogador</span>!</h1><p>Aqui esta seu resumo de hoje.</p></div>
+    <div class="cards-grid">
+      <div class="stat-card"><div class="label">Saldo disponivel</div><div class="value green">66.00 MATIC</div><div class="sub">aprox R$ 330,00</div></div>
+      <div class="stat-card"><div class="label">Desafios ativos</div><div class="value">2</div><div class="sub">1 aguardando rival</div></div>
+      <div class="stat-card"><div class="label">Vitorias totais</div><div class="value green">7</div><div class="sub">Win rate: 70%</div></div>
+      <div class="stat-card"><div class="label">Ganhos totais</div><div class="value green">+124.5 MATIC</div><div class="sub">Este mes</div></div>
+    </div>
+    <div class="section-title">Desafios recentes <button class="btn-sm" onclick="goPage('novo',document.querySelectorAll('.nav-item')[2])">+ Criar desafio</button></div>
+    <div class="challenges">
+      <div class="challenge-card"><div class="ch-game">Game</div><div class="ch-info"><div class="ch-title">FIFA 25 - 1v1 Ultimate</div><div class="ch-sub">vs KingSlayer99 - PSN</div></div><div class="ch-value"><div class="ch-amount">50 MATIC</div><div class="ch-status status-active">Em andamento</div></div></div>
+      <div class="challenge-card"><div class="ch-game">Race</div><div class="ch-info"><div class="ch-title">iRacing - Formula A</div><div class="ch-sub">Aguardando rival - iRacing</div></div><div class="ch-value"><div class="ch-amount">30 MATIC</div><div class="ch-status status-waiting">Aguardando</div></div><div class="ch-actions"><button class="btn-cancel" onclick="showToast('Desafio cancelado')">Cancelar</button></div></div>
+    </div>
+  </div>
+  <div class="page" id="page-desafios">
+    <div class="page-header"><h1>Meus Desafios</h1><p>Gerencie todos os seus desafios.</p></div>
+    <div class="challenges">
+      <div class="challenge-card"><div class="ch-game">Game</div><div class="ch-info"><div class="ch-title">FIFA 25 - 1v1 Ultimate</div><div class="ch-sub">vs KingSlayer99 - PSN - Iniciado ha 2h</div></div><div class="ch-value"><div class="ch-amount">50 MATIC</div><div class="ch-status status-active">Ativo</div></div></div>
+      <div class="challenge-card"><div class="ch-game">Race</div><div class="ch-info"><div class="ch-title">iRacing - Formula A</div><div class="ch-sub">Aguardando oponente - iRacing</div></div><div class="ch-value"><div class="ch-amount">30 MATIC</div><div class="ch-status status-waiting">Aberto</div></div><div class="ch-actions"><button class="btn-accept" onclick="showToast('Link copiado! Compartilhe com seu rival.')">Compartilhar</button><button class="btn-cancel" onclick="showToast('Desafio cancelado.')">Cancelar</button></div></div>
+      <div class="challenge-card"><div class="ch-game">PC</div><div class="ch-info"><div class="ch-title">CS2 - Partida ranked</div><div class="ch-sub">vs DragonFire88 - Steam</div></div><div class="ch-value"><div class="ch-amount">20 MATIC</div><div class="ch-status status-active">Ativo</div></div></div>
+    </div>
+  </div>
+  <div class="page" id="page-novo">
+    <div class="page-header"><h1>Criar Desafio</h1><p>Configure sua aposta.</p></div>
+    <div class="form-card">
+      <div class="form-row">
+        <div class="form-group"><label>Jogo</label><select id="nc-game"><option>FIFA 25</option><option>CS2</option><option>iRacing</option><option>Rocket League</option><option>Valorant</option><option>Call of Duty</option></select></div>
+        <div class="form-group"><label>Plataforma</label><select id="nc-platform"><option>PSN</option><option>Steam</option><option>Xbox</option><option>iRacing</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Valor (MATIC)</label><input type="number" id="nc-amount" placeholder="Ex: 50" min="1"></div>
+        <div class="form-group"><label>Usuario do rival</label><input type="text" id="nc-rival" placeholder="Ex: KingSlayer99"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:16px"><label>Regras</label><input type="text" id="nc-rules" placeholder="Ex: Melhor de 3"></div>
+      <button class="btn-create" onclick="createChallenge()">Criar Desafio e Depositar</button>
+    </div>
+  </div>
+  <div class="page" id="page-carteira">
+    <div class="page-header"><h1>Carteira</h1><p>Gerencie seu saldo em cripto.</p></div>
+    <div class="wallet-card">
+      <div class="wallet-sub">Saldo disponivel</div>
+      <div class="wallet-balance">66.00 MATIC</div>
+      <div class="wallet-sub">Carteira Polygon - <span style="color:#00e87a;font-size:.8rem">0x71C7...9F3A</span></div>
+      <div class="wallet-actions">
+        <button class="btn-wallet btn-deposit" onclick="openModal('deposit')">+ Depositar</button>
+        <button class="btn-wallet btn-withdraw" onclick="openModal('withdraw')">Sacar</button>
+      </div>
+    </div>
+    <div class="section-title">Ultimas transacoes</div>
+    <div class="tx-list">
+      <div class="tx-item"><div class="tx-icon in">IN</div><div class="tx-info"><div class="tx-desc">Vitoria - FIFA 25 vs KingSlayer99</div><div class="tx-date">23/04/2026</div></div><div class="tx-amount in">+80 MATIC</div></div>
+      <div class="tx-item"><div class="tx-icon out">OUT</div><div class="tx-info"><div class="tx-desc">Deposito - Desafio iRacing</div><div class="tx-date">22/04/2026</div></div><div class="tx-amount out">-30 MATIC</div></div>
+      <div class="tx-item"><div class="tx-icon in">IN</div><div class="tx-info"><div class="tx-desc">Vitoria - CS2 vs DragonFire88</div><div class="tx-date">20/04/2026</div></div><div class="tx-amount in">+16 MATIC</div></div>
+    </div>
+  </div>
+  <div class="page" id="page-historico">
+    <div class="page-header"><h1>Historico</h1><p>Todos os desafios que voce participou.</p></div>
+    <div class="challenges">
+      <div class="challenge-card"><div class="ch-game">Game</div><div class="ch-info"><div class="ch-title">FIFA 25 vs KingSlayer99</div><div class="ch-sub">PSN - 23/04/2026</div></div><div class="ch-value"><div class="ch-amount">+80 MATIC</div><div class="ch-status status-won">Vitoria</div></div></div>
+      <div class="challenge-card"><div class="ch-game">PC</div><div class="ch-info"><div class="ch-title">CS2 vs DragonFire88</div><div class="ch-sub">Steam - 20/04/2026</div></div><div class="ch-value"><div class="ch-amount">+16 MATIC</div><div class="ch-status status-won">Vitoria</div></div></div>
+      <div class="challenge-card"><div class="ch-game">Race</div><div class="ch-info"><div class="ch-title">iRacing vs TurboKing</div><div class="ch-sub">iRacing - 15/04/2026</div></div><div class="ch-value"><div class="ch-amount">-20 MATIC</div><div class="ch-status status-lost">Derrota</div></div></div>
+    </div>
+  </div>
+</main>
+<div class="modal-bg" id="modal-bg" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3 id="modal-title">Depositar MATIC</h3>
+    <div class="form-group"><label id="modal-label">Valor (MATIC)</label><input type="number" id="modal-input" placeholder="Ex: 100" min="1"></div>
+    <div class="modal-btns"><button class="modal-cancel" onclick="closeModal()">Cancelar</button><button class="modal-confirm" onclick="confirmModal()">Confirmar</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"><span>OK</span><span id="toast-msg"></span></div>
+<script>
+const userData=JSON.parse(localStorage.getItem('mv_user')||'{"username":"Jogador","email":"demo@matchvault.gg","platform":"PSN"}');
+document.getElementById('welcome-name').textContent=userData.username;
+document.getElementById('sidebar-username').textContent=userData.username;
+document.getElementById('avatar-initial').textContent=userData.username.charAt(0).toUpperCase();
+function goPage(p,el){document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');if(el)el.classList.add('active');}
+function createChallenge(){const amount=document.getElementById('nc-amount').value;if(!amount||amount<1)return showToast('Informe um valor valido.');showToast('Desafio criado! Compartilhe o link com seu rival.');goPage('desafios',document.querySelectorAll('.nav-item')[1]);}
+let modalMode='';
+function openModal(mode){modalMode=mode;document.getElementById('modal-title').textContent=mode==='deposit'?'Depositar MATIC':'Sacar MATIC';document.getElementById('modal-bg').classList.add('open');}
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
+function confirmModal(){const val=document.getElementById('modal-input').value;if(!val)return;closeModal();showToast(modalMode==='deposit'?'Deposito de '+val+' MATIC realizado!':'Saque de '+val+' MATIC solicitado!');}
+function showToast(msg){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+function logout(){localStorage.removeItem('mv_user');window.location.href='register.html';}
+</script>
+</body>
+</html>
